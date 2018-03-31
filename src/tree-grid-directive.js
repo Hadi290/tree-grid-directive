@@ -15,7 +15,7 @@
                     "   </thead>\n" +
                     "   <tbody>\n" +
                     "     <tr ng-repeat=\"row in tree_rows | searchFor:$parent.filterString:expandingProperty:colDefinitions track by row.branch.uid\"\n" +
-                    "       ng-class=\"'level-' + {{ row.level }} + (row.branch.selected ? ' active':'')\" class=\"tree-grid-row\">\n" +
+                    "       ng-class=\"'level-' + {{ row.level }} + (row.branch.selected ? ' active ':' ') + {{rowClass(row)}}\" class=\"tree-grid-row\">\n" +
                     "       <td><a ng-click=\"user_clicks_branch(row.branch)\"><i ng-class=\"row.tree_icon\"\n" +
                     "              ng-click=\"row.branch.expanded = !row.branch.expanded\"\n" +
                     "              class=\"indented tree-icon\"></i></a><span ng-if=\"expandingProperty.cellTemplate\" class=\"indented tree-label\" " +
@@ -46,7 +46,7 @@
                     restrict: 'A',
                     link: function (scope, element, attrs) {
                         scope.cellTemplateScope = scope.$eval(attrs.cellTemplateScope);
-
+                        
                         // Watch for changes to expression.
                         scope.$watch(attrs.compile, function (new_val) {
                             /*
@@ -88,7 +88,8 @@
                         onClick: '&',
                         initialSelection: '@',
                         treeControl: '=',
-                        expandTo: '='
+                        expandTo: '=',
+                        rowClass: '=?'
                     },
                     link: function (scope, element, attrs) {
                         var error, expandingProperty, expand_all_parents, expand_level, for_all_ancestors, for_each_branch, get_parent, n, on_treeData_change, select_branch, selected_branch, tree;
@@ -111,6 +112,8 @@
                             alert('No data was defined for the tree, please define treeData!');
                             return;
                         }
+
+                        scope.rowClass = scope.rowClass || function() { return [""] };
 
                         var getExpandingProperty = function getExpandingProperty() {
                             if (attrs.expandOn) {
